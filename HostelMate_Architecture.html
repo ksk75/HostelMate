@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostelMate - Project Architecture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #16a085; }
+        .mermaid { margin: 30px 0; display: flex; justify-content: center; }
+        .qa-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .qa-box strong { color: #2c3e50; display: block; margin-bottom: 5px; }
+        .qa-box em { color: #555; font-style: normal; }
+        
+        @media print {
+            body { padding: 0; }
+            .mermaid { page-break-inside: avoid; }
+            .qa-box { page-break-inside: avoid; }
+        }
+    </style>
+    <!-- Use Mermaid v9 which supports direct script tag loading -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            mermaid.initialize({ startOnLoad: true, theme: 'default' });
+        });
+    </script>
+</head>
+<body>
+
+    <h1>HostelMate — Hostel Expense Management System</h1>
+    <p><strong>Developed for:</strong> MCA Final-Year Mini Project</p>
+
+    <h2>1. Project Overview</h2>
+    <p><strong>HostelMate</strong> is a comprehensive, production-ready Java Web Application designed specifically for college hostel residents. Its primary goal is to eliminate the confusion and disputes associated with shared expenses by providing a centralized platform for managing rent, mess bills, utility payments, and roommate settlements.</p>
+
+    <h3>Key Objectives</h3>
+    <ul>
+        <li><strong>Transparency:</strong> Ensure every resident knows exactly what they owe and to whom.</li>
+        <li><strong>Automation:</strong> Automate complex calculations for split expenses (both equal and custom splits).</li>
+        <li><strong>Role-Based Access Control:</strong> Differentiate between Hostel Administrators (managing rooms, users, and overall reports) and Students (managing daily expenses).</li>
+    </ul>
+
+    <h2>2. Architecture Diagram (3-Tier MVC)</h2>
+    <div class="mermaid">
+    graph TD
+        classDef client fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+        classDef controller fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+        classDef model fill:#e8f5e9,stroke:#43a047,stroke-width:2px;
+        classDef dao fill:#fff3e0,stroke:#f4511e,stroke-width:2px;
+        classDef db fill:#eceff1,stroke:#546e7a,stroke-width:2px;
+
+        Client["Client Browser (HTML, CSS, JS, Chart.js)"]:::client
+
+        subgraph Web_Layer["Web Layer (Controllers)"]
+            AuthServlet["Auth/Login Servlets"]:::controller
+            StudentServlet["Student Servlets"]:::controller
+            AdminServlet["Admin Servlets"]:::controller
+            Filters["Security Filters"]:::controller
+        end
+
+        subgraph Business_Layer["Business Layer"]
+            Models["Java Beans (User, Expense)"]:::model
+        end
+
+        subgraph Data_Access_Layer["Data Access Layer"]
+            UserDAO["UserDAO"]:::dao
+            ExpenseDAO["ExpenseDAO"]:::dao
+            SettlementDAO["SettlementDAO"]:::dao
+        end
+
+        DB[("MySQL Database")]:::db
+
+        Client <-->|HTTP Requests| Filters
+        Filters <--> AuthServlet
+        Filters <--> StudentServlet
+        Filters <--> AdminServlet
+
+        AuthServlet --> Models
+        StudentServlet --> Models
+        AdminServlet --> Models
+
+        AuthServlet --> UserDAO
+        StudentServlet --> ExpenseDAO
+        StudentServlet --> SettlementDAO
+        AdminServlet --> UserDAO
+
+        UserDAO <-->|JDBC/SQL| DB
+        ExpenseDAO <-->|JDBC/SQL| DB
+        SettlementDAO <-->|JDBC/SQL| DB
+    </div>
+
+    <h2>3. Technology Stack & Justification</h2>
+    <p><em>(For Interview Explanations)</em></p>
+
+    <h3>Frontend</h3>
+    <ul>
+        <li><strong>HTML5, CSS3, JS:</strong> Keeps the application lightweight. Server-rendered pages are very fast.</li>
+        <li><strong>JSP & JSTL:</strong> Allows dynamic content generation directly from Java backend objects.</li>
+        <li><strong>Chart.js:</strong> Used for the dashboard analytics. It renders high-performance HTML5 canvas charts.</li>
+        <li><strong>Design (Glassmorphism):</strong> Demonstrates a strong understanding of modern UI/UX trends, breaking away from traditional academic projects.</li>
+    </ul>
+
+    <h3>Backend & Database</h3>
+    <ul>
+        <li><strong>Java 11 & Servlets:</strong> Chosen for its robust object-oriented features. Demonstrates a foundational understanding of HTTP request/response lifecycles before relying on abstractions like Spring Boot.</li>
+        <li><strong>BCrypt:</strong> Used for password hashing. BCrypt automatically handles salting and is computationally expensive, making it highly resistant to attacks.</li>
+        <li><strong>MySQL 8.0+:</strong> A powerful RDBMS handling concurrent requests with InnoDB.</li>
+        <li><strong>JDBC (PreparedStatement):</strong> Prevents SQL Injection attacks by pre-compiling the SQL query and treating user inputs strictly as parameters.</li>
+    </ul>
+
+    <h2>4. Key Architectural Patterns Used</h2>
+    <ul>
+        <li><strong>MVC (Model-View-Controller):</strong> Models are POJOs, Views are JSPs, and Controllers are Servlets.</li>
+        <li><strong>DAO (Data Access Object):</strong> Separates business logic from low-level database operations.</li>
+        <li><strong>Singleton:</strong> The <code>DBConnection.java</code> utility acts as a factory providing JDBC connections and optimizing memory.</li>
+        <li><strong>Filter Pattern:</strong> <code>AuthFilter.java</code> intercepts incoming requests and verifies session tokens to centralize security.</li>
+    </ul>
+
+    <h2>5. Interview Questions & Answers</h2>
+
+    <div class="qa-box">
+        <strong>Q: How does the application handle expense splitting?</strong>
+        <em>A: When a user creates an expense, they specify the amount and the split type (Equal or Custom). The <code>ExpenseServlet</code> iterates through the roommates. For an "Equal" split, it divides the total amount by the number of participants and creates individual <code>expense_shares</code> records in the database. The payer gets a 'paid' status, while others get 'unpaid' dues.</em>
+    </div>
+
+    <div class="qa-box">
+        <strong>Q: How did you secure the application?</strong>
+        <em>A: Security is implemented at three levels: (1) <strong>Database:</strong> Passwords are hashed using BCrypt. (2) <strong>Application:</strong> SQL Injection is prevented using JDBC <code>PreparedStatement</code>. (3) <strong>Session:</strong> An <code>AuthFilter</code> blocks unauthorized access to internal pages.</em>
+    </div>
+
+    <div class="qa-box">
+        <strong>Q: How do settlements work?</strong>
+        <em>A: The system calculates net balances by aggregating all unpaid <code>expense_shares</code> between two users. When user A pays user B, a <code>Settlement</code> record is created, and the corresponding expense shares are marked as <code>is_paid = true</code>, zeroing out the balance.</em>
+    </div>
+
+    <div class="qa-box">
+        <strong>Q: What happens if two people try to add an expense at the exact same time?</strong>
+        <em>A: Since we use MySQL with the InnoDB engine, it handles concurrent connections using Row-Level Locking and ACID properties. The Servlets are stateless, meaning concurrent HTTP threads can safely execute DAO methods simultaneously without overwriting each other's data.</em>
+    </div>
+
+</body>
+</html>
