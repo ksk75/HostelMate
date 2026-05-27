@@ -53,11 +53,17 @@ A complete, production-ready Java Web Application (Servlets & JSP) designed for 
 ## Screenshots & UI
 The application features a modern, premium design with Dark Mode support, glassmorphism elements, and fully responsive layouts optimized for both desktop and mobile devices.
 
-### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
+### Landing Page
+![Landing Page](assets/landing.png)
 
-### Login Page
-![Login Page](docs/screenshots/login.png)
+### Student Dashboard
+![Dashboard](assets/dashboard.png)
+
+### My Expenses
+![My Expenses](assets/expenses.png)
+
+### Settlements
+![Settlements](assets/settlements.png)
 
 ---
 *Developed for MCA Final-Year Mini Project in College Of Engineering, Guindy.*

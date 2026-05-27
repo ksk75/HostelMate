@@ -45,3 +45,6 @@ buildNumber.properties
 
 # macOS
 .DS_Store
+
+# Ignore docs directory
+docs/
